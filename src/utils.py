@@ -4,6 +4,7 @@ import pandas_datareader.data as reader
 import datetime as dt
 from os.path import exists
 
+
 def get_data(path, stocks, fetch=False):
     end = dt.datetime.now()
     start = dt.date(end.year - 5, end.month, end.day)
@@ -15,19 +16,19 @@ def get_data(path, stocks, fetch=False):
         df = pd.read_csv(path, parse_dates=[0], index_col=0)
     return df
 
+
 def get_return_simulation(df, stocks):
     """Returns investment simulation metrics
-        df: pd.Dataframe
-            df[keyof stocks]: number[]
-            df[f"{keyof stocks}_TRANSACTIONS"]: 0|1
-        stocks: str[]
+    df: pd.Dataframe
+        df[keyof stocks]: number[]
+        df[f"{keyof stocks}_TRANSACTIONS"]: 0|1
+    stocks: str[]
     """
     simulation_results = {}
 
     for s in stocks:
         # base returns
         df[f"{s}_RETURNS"] = np.log(df[s] / df[s].shift(1))
-
 
         # simulated total money
         df[f"{s}_STRATEGY_GAIN"] = 0
@@ -45,23 +46,23 @@ def get_return_simulation(df, stocks):
                     if np.isnan(df.loc[last, f"{s}_RETURNS"])
                     else np.exp(df.loc[last, f"{s}_RETURNS"])
                 )
+                transactions = df.loc[i, f"{s}_TRANSACTIONS"] * df.loc[i, s]
 
                 df.loc[i, f"{s}_STRATEGY_GAIN"] = (
-                    ret * df.loc[last, f"{s}_STRATEGY_GAIN"]
-                    + df.loc[last, f"{s}_TRANSACTIONS"] * 10
+                    ret * df.loc[last, f"{s}_STRATEGY_GAIN"] + transactions
                 )
-                inv += df.loc[last, f"{s}_TRANSACTIONS"] * 10
+                inv += transactions
 
         simulation_results[s] = {
             "base returns": df.iloc[-1][s] / df.iloc[0][s],
             "amount invested": inv,
-            "strategy returns": df.iloc[-1][f"{s}_STRATEGY_GAIN"] / inv
+            "strategy returns": df.iloc[-1][f"{s}_STRATEGY_GAIN"] / inv,
         }
     return simulation_results
 
+
 def add_dca_transactions(df, stocks):
-    """Adds dollar cost averaging strategy transactions
-    """
+    """Adds dollar cost averaging strategy transactions"""
     for s in stocks:
         df[f"{s}_TRANSACTIONS"] = 0
         df.loc[df.index.day < 10, f"{s}_TRANSACTIONS"] = 1
