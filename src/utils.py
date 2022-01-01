@@ -28,30 +28,26 @@ def get_return_simulation(df, stocks):
 
     for s in stocks:
         # base returns
-        df[f"{s}_RETURNS"] = np.log(df[s] / df[s].shift(1))
+        df[f"{s}_RETURNS"] = (df[s] / df[s].shift(1)).fillna(1)
 
         # simulated total money
         df[f"{s}_STRATEGY_GAIN"] = 0
 
         # keeps track of how much money is invested
         inv = 0
-        for i in df.index:
-            if i == df.first_valid_index():
-                df.loc[i, f"{s}_STRATEGY_GAIN"] = df.loc[i, s]
-                inv += df.loc[i, s]
-            else:
-                last = df.index[df.index.get_loc(i) - 1]
-                ret = (
-                    1
-                    if np.isnan(df.loc[last, f"{s}_RETURNS"])
-                    else np.exp(df.loc[last, f"{s}_RETURNS"])
-                )
-                transactions = df.loc[i, f"{s}_TRANSACTIONS"] * df.loc[i, s]
 
-                df.loc[i, f"{s}_STRATEGY_GAIN"] = (
-                    ret * df.loc[last, f"{s}_STRATEGY_GAIN"] + transactions
-                )
-                inv += transactions
+        for tr in df[df[f"{s}_TRANSACTIONS"] == 1].index:
+            ser = pd.Series(0, index=df.index)
+
+            cur_share_value = df.loc[tr, s]
+            ser[ser.index >= tr] = cur_share_value
+            inv += cur_share_value
+
+            ret = df[f"{s}_RETURNS"].copy()
+            ret[ret.index <= tr] = 1
+
+            ser *= ret.cumprod()
+            df[f"{s}_STRATEGY_GAIN"] += ser
 
         simulation_results[s] = {
             "base returns": df.iloc[-1][s] / df.iloc[0][s],
