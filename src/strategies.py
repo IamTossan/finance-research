@@ -51,7 +51,7 @@ def ema(df, stocks, ema1, ema2):
     return df
 
 
-def rsi(df, stocks, periods=14, ema=True):
+def rsi(df, stocks, periods=14, threshold=30, ema=True):
     close_delta = df[stocks].diff()
 
     up = close_delta.clip(lower=0)
@@ -71,7 +71,7 @@ def rsi(df, stocks, periods=14, ema=True):
 
     for s in stocks:
 
-        dff[f"{s}_POSITION"] = np.where(dff[f"{s}_RSI"] < 30, 0, 1)
+        dff[f"{s}_POSITION"] = np.where(dff[f"{s}_RSI"] < threshold, 0, 1)
 
         dff[f"{s}_TRANSACTIONS"] = dff[f"{s}_POSITION"].diff().clip(lower=0)
         dff.loc[dff.index[0], f"{s}_TRANSACTIONS"] = 1
