@@ -55,12 +55,3 @@ def get_return_simulation(df, stocks):
             "strategy returns": df.iloc[-1][f"{s}_STRATEGY_GAIN"] / inv,
         }
     return simulation_results
-
-
-def add_dca_transactions(df, stocks):
-    """Adds dollar cost averaging strategy transactions"""
-    for s in stocks:
-        df[f"{s}_TRANSACTIONS"] = 0
-        df.loc[df.index.day < 10, f"{s}_TRANSACTIONS"] = 1
-        df[f"{s}_TRANSACTIONS"] = df[f"{s}_TRANSACTIONS"].diff().clip(lower=0)
-        df.loc[df.index[0], f"{s}_TRANSACTIONS"] = 1
