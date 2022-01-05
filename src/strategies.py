@@ -99,3 +99,24 @@ def bollinger_bands(df, stocks, periods=20):
         dff.loc[dff.index[0], f"{s}_TRANSACTIONS"] = 1
     
     return dff
+
+def stochastic_oscillator(df, stocks, k_period=14, d_period=3):
+    n_high = df['High'].rolling(k_period).max()
+    n_low = df['Low'].rolling(k_period).min()
+
+    k = (df['Close'] - n_low) * 100 / (n_high - n_low)
+    d = k.rolling(d_period).mean()
+
+    dff = pd.concat([
+        df['Close'],
+        k.add_suffix('_%K'),
+        d.add_suffix('_%D')
+    ], axis=1)
+
+    for s in stocks:
+        dff[f"{s}_POSITION"] = np.where((dff[f"{s}_%K"] < 20) & (dff[f"{s}_%D"] < 20) & (dff[f"{s}_%K"] > dff[f"{s}_%D"]), 1, 0)
+
+        dff[f"{s}_TRANSACTIONS"] = dff[f"{s}_POSITION"].diff().clip(lower=0)
+        dff.loc[dff.index[0], f"{s}_TRANSACTIONS"] = 1
+
+    return dff
