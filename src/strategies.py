@@ -77,3 +77,25 @@ def rsi(df, stocks, periods=14, threshold=30, ema=True):
         dff.loc[dff.index[0], f"{s}_TRANSACTIONS"] = 1
 
     return dff
+
+def bollinger_bands(df, stocks, periods=20):
+    tp = (df['Close'] + df['Low'] + df['High']) / 3
+    std = tp.rolling(periods).std(ddof=0)
+    ma = tp.rolling(periods).mean()
+    bolu = ma + 2 * std
+    bold = ma - 2 * std
+
+    dff = pd.concat([
+        df['Close'],
+        bolu.add_suffix('_BOLU'),
+        bold.add_suffix('_BOLD')
+    ], axis=1)
+
+    for s in stocks:
+        dff[f"{s}_POSITION"] = np.where(
+            dff[s] <= dff[f"{s}_BOLD"], 1, 0
+        )
+        dff[f"{s}_TRANSACTIONS"] = dff[f"{s}_POSITION"].diff().clip(lower=0)
+        dff.loc[dff.index[0], f"{s}_TRANSACTIONS"] = 1
+    
+    return dff
