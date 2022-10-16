@@ -6,7 +6,7 @@ import os
 
 symbols = {
     "stocks": {
-        "symbols": ["MFED.PA", "PE500.PA", "EN.PA", "CNP.PA", "TTE.PA"],
+        "symbols": ["MFED.PA", "PE500.PA", "EN.PA", "TTE.PA"],
         "path": "../data/stocks.csv"
     },
     "cryptos": {
