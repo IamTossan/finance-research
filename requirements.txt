@@ -5,6 +5,7 @@ Babel==2.9.1
 backcall==0.2.0
 black==21.12b0
 bleach==4.1.0
+bt==0.2.9
 certifi==2021.10.8
 cffi==1.15.0
 charset-normalizer==2.0.9
@@ -59,6 +60,7 @@ patsy==0.5.2
 pexpect==4.8.0
 pickleshare==0.7.5
 Pillow==8.4.0
+pkg_resources==0.0.0
 platformdirs==2.4.0
 prometheus-client==0.12.0
 prompt-toolkit==3.0.21
@@ -66,6 +68,7 @@ ptyprocess==0.7.0
 pycparser==2.20
 Pygments==2.10.0
 pyparsing==2.4.7
+PyPrind==2.11.3
 pyrsistent==0.18.0
 python-dateutil==2.8.2
 pytz==2021.3
@@ -87,7 +90,7 @@ threadpoolctl==3.0.0
 tomli==1.2.3
 tornado==6.1
 traitlets==5.1.1
-typing-extensions==4.0.1
+typing_extensions==4.0.1
 urllib3==1.26.7
 wcwidth==0.2.5
 webencodings==0.5.1
